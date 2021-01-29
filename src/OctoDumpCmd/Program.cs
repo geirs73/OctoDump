@@ -24,7 +24,6 @@ namespace OctoDumpCmd
             var variableSetResult = spaceRepo.LibraryVariableSets.FindByName(args[0]);
             var criteriumVariableSet = spaceRepo.VariableSets.Get(variableSetResult.VariableSetId);
 
-            //var variables = vset.Variables;
 
             Console.WriteLine($"Looking for usages of variables from variable set {variableSetResult.Name} in {space.Name}");
 
@@ -45,39 +44,36 @@ namespace OctoDumpCmd
 
             foreach (var project in projects)
             {
-                if (!(project.Name.Equals("Fis.Api.ClassStatus.Customers"))) continue;
+                // if (!(project.Name.Equals("Fis.Api.ClassStatus.Customers"))) continue;
 
-                Console.WriteLine($"Checking project {project.Name}");
+                // Console.WriteLine($"Checking project {project.Name}");
                 var projectVariableSet = spaceRepo.VariableSets.Get(project.VariableSetId);
                 if (projectVariableSet == null) continue;
-                foreach (var variable in criteriumVariableSet.Variables)
-                {
 
-                    foreach (var pv in projectVariableSet.Variables)
-                    {
-                        Console.WriteLine($"does '{variable.Name}' exist in '{pv.Value ?? string.Empty}' ");
-                    }
-                    var matchingValueVariables = (from pv in projectVariableSet.Variables
-                                                  where (pv.Value ?? "").Contains(variable.Name)
-                                                  select pv).ToList();
-                    foreach (var mv in matchingValueVariables)
-                    {
-                        var foo = mv.Value;
-                    }
+                foreach (var projectVariable in projectVariableSet.Variables)
+                {
+                    FindMatches(criteriumVariableSet, projectVariable.Name, projectVariable.Value ?? "", $"{project.Name}/ProjectVariable/{projectVariable.Name}");
                 }
+
                 var deploymentProcess = spaceRepo.DeploymentProcesses.Get(project.DeploymentProcessId);
+
+                int stepCounter = 0;
                 foreach (var step in deploymentProcess.Steps)
                 {
-                    var props = new List<DeploymentStepProperties>();
+                    stepCounter++;
+                    int actionCounter = 0;
                     foreach (var action in step.Actions)
                     {
-                        
-
+                        actionCounter++;
+                        foreach (var prop in action.Properties)
+                        {
+                            FindMatches(criteriumVariableSet, prop.Key, prop.Value?.Value ?? "", $"/Project/{project.Name}/Step/{stepCounter}:{step.Name}/Actions/{actionCounter}:{action.Name}/{prop.Key}");
+                        }
                     }
-                    
-                    foreach (var prop in props)
+
+                    foreach (var prop in step.Properties)
                     {
-                        var foo2 = prop.Key;
+                        FindMatches(criteriumVariableSet, prop.Key, prop.Value?.Value, $"/Project/{project.Name}/Step/{stepCounter}:{step.Name}/{prop.Key}");
                     }
                 }
             }
@@ -86,5 +82,16 @@ namespace OctoDumpCmd
             // var machines = repository.Machines.List();
             // var foo = machines;
         }
+        private static void FindMatches(VariableSetResource criteriumVariableSet, string key, string value, string path)
+        {
+            foreach (var criteriumVariable in criteriumVariableSet.Variables)
+            {
+                if (value.Contains(criteriumVariable.Name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Console.WriteLine($"{path}: {value}");
+                }
+            }
+        }
+
     }
 }

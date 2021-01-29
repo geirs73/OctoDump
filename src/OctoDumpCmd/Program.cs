@@ -21,34 +21,67 @@ namespace OctoDumpCmd
             var space = sysRepo.Spaces.FindByName("Default");
             var spaceRepo = client.ForSpace(space);
 
-            var vset = spaceRepo.LibraryVariableSets.FindByName(args[0]);
-            var vset2 = spaceRepo.VariableSets.Get(vset.VariableSetId);
+            var variableSetResult = spaceRepo.LibraryVariableSets.FindByName(args[0]);
+            var criteriumVariableSet = spaceRepo.VariableSets.Get(variableSetResult.VariableSetId);
 
             //var variables = vset.Variables;
 
-            Console.WriteLine($"Looking for usages of variables from variable set {vset.Name} in {space.Name}");
+            Console.WriteLine($"Looking for usages of variables from variable set {variableSetResult.Name} in {space.Name}");
+
+
 
             var projects = spaceRepo.Projects.GetAll().ToList();
+
+
+
+            // foreach (var project in projects)
+            // {
+            //     var projectVariableSet = spaceRepo.VariableSets.Get(project.VariableSetId);
+            //     foreach (var projectVariable in projectVariableSet.Variables) 
+            //     {
+            //         Console.WriteLine($"{project.Name}_{projectVariable.Name}");
+            //     }
+            // }
+
             foreach (var project in projects)
             {
+                if (!(project.Name.Equals("Fis.Api.ClassStatus.Customers"))) continue;
 
                 Console.WriteLine($"Checking project {project.Name}");
                 var projectVariableSet = spaceRepo.VariableSets.Get(project.VariableSetId);
                 if (projectVariableSet == null) continue;
-                foreach (var variable in vset2.Variables)
+                foreach (var variable in criteriumVariableSet.Variables)
                 {
-                    var matchingValueVariables = (from v in projectVariableSet.Variables
-                                                 where (v.Value ?? "").Contains(variable.Name) 
-                                                 select v).ToList();
+
+                    foreach (var pv in projectVariableSet.Variables)
+                    {
+                        Console.WriteLine($"does '{variable.Name}' exist in '{pv.Value ?? string.Empty}' ");
+                    }
+                    var matchingValueVariables = (from pv in projectVariableSet.Variables
+                                                  where (pv.Value ?? "").Contains(variable.Name)
+                                                  select pv).ToList();
                     foreach (var mv in matchingValueVariables)
-                    { 
+                    {
                         var foo = mv.Value;
                     }
+                }
+                var deploymentProcess = spaceRepo.DeploymentProcesses.Get(project.DeploymentProcessId);
+                foreach (var step in deploymentProcess.Steps)
+                {
+                    var props = new List<DeploymentStepProperties>();
+                    foreach (var action in step.Actions)
+                    {
+                        
 
-
-
+                    }
+                    
+                    foreach (var prop in props)
+                    {
+                        var foo2 = prop.Key;
+                    }
                 }
             }
+
 
             // var machines = repository.Machines.List();
             // var foo = machines;

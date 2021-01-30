@@ -18,15 +18,15 @@ namespace OctoDump
                 var usageCmd = new Command("usage");
                 rootCommand.Add(usageCmd);
 
-                var vsuCmd = new Command("variable-set");
-                VariableSetUsageCommandLine.CmdSymbols.ForEach(a => vsuCmd.Add(a));
-                vsuCmd.Handler = CommandHandler.Create<VariableSetUsageConfiguration>(c => ExecuteVariableSetUsage(c));
-                usageCmd.Add(vsuCmd);
+                var variableSetUsageCmd = new Command("variable-set");
+                VariableSetUsageCommandLine.CmdSymbols.ForEach(a => variableSetUsageCmd.Add(a));
+                variableSetUsageCmd.Handler = CommandHandler.Create<VariableSetUsageConfiguration>(c => ExecuteVariableSetUsage(c));
+                usageCmd.Add(variableSetUsageCmd);
 
-                var vuCmd = new Command("variable");
-                VariableUsageCommandLine.CmdSymbols.ForEach(a => vuCmd.Add(a));
-                vuCmd.Handler = CommandHandler.Create<VariableUsageConfiguration>(c => ExecuteVariableUsage(c));
-                usageCmd.Add(vuCmd);
+                var variableUsageCmd = new Command("variable");
+                VariableUsageCommandLine.CmdSymbols.ForEach(a => variableUsageCmd.Add(a));
+                variableUsageCmd.Handler = CommandHandler.Create<VariableUsageConfiguration>(c => ExecuteVariableUsage(c));
+                usageCmd.Add(variableUsageCmd);
 
                 // int res = rootCommand.InvokeAsync(args).Result;
                 int res = rootCommand.Invoke(args);

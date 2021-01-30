@@ -4,12 +4,6 @@ namespace OctoDump.Infrastructure
 {
     public class OctoConnection
     {
-        public OctoConnection()
-        {
-            Server = System.Environment.GetEnvironmentVariable("OctoServer");
-            ApiKey = System.Environment.GetEnvironmentVariable("OctoApiKey");
-        }
-
         public OctoConnection(string server, string apiKey)
         {
             Server = server;

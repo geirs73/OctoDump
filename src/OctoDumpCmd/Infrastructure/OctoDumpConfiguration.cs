@@ -21,9 +21,15 @@ namespace OctoDump.Infrastructure
             {
                 var symbols = new List<Symbol>()
                 {
-                    new Option<string>( "--space-name", getDefaultValue: () => "Default", "Name of space to query"),
-                    new Option<string>( "--apiKey", "Octopus ApiKey"),
-                    new Option<string>( "--server", "Octopus server url")
+                    new Option<string>( "--space-name",
+                        getDefaultValue: () => "Default",
+                        description: "Name of space to query"),
+                    new Option<string>( "--apiKey",
+                        getDefaultValue: ()=> System.Environment.GetEnvironmentVariable("OctoApiKey"),
+                        description: "Octopus ApiKey"),
+                    new Option<string>("--server",
+                        getDefaultValue: () => System.Environment.GetEnvironmentVariable("OctoServer"),
+                        description: "Octopus server url")
                 };
                 return symbols;
 

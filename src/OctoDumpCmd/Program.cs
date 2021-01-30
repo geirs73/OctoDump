@@ -14,23 +14,19 @@ namespace OctoDump
             try
             {
                 var rootCommand = new RootCommand("octodump");
-                rootCommand.Handler = CommandHandler.Create<OctoDumpConfiguration>(c => Execute(c));
-                OctoDumpCommandLine.CmdSymbols.ForEach(s => rootCommand.Add(s));
 
                 var usageCmd = new Command("usage");
                 rootCommand.Add(usageCmd);
 
-                var vsuCmd = new Command("variable-set");
-                vsuCmd.AddAlias("vs");
-                VariableSetUsageCommandLine.CmdSymbols.ForEach(a => vsuCmd.Add(a));
-                vsuCmd.Handler = CommandHandler.Create<VariableSetUsageConfiguration>(c => ExecuteVariableSetUsage(c));
-                usageCmd.Add(vsuCmd);
+                var variableSetUsageCmd = new Command("variable-set");
+                VariableSetUsageCommandLine.CmdSymbols.ForEach(a => variableSetUsageCmd.Add(a));
+                variableSetUsageCmd.Handler = CommandHandler.Create<VariableSetUsageConfiguration>(c => ExecuteVariableSetUsage(c));
+                usageCmd.Add(variableSetUsageCmd);
 
-                var vuCmd = new Command("variable");
-                vuCmd.AddAlias("var");
-                VariableUsageCommandLine.CmdSymbols.ForEach(a => vuCmd.Add(a));
-                vuCmd.Handler = CommandHandler.Create<VariableUsageConfiguration>(c => ExecuteVariableUsage(c));
-                usageCmd.Add(vuCmd);
+                var variableUsageCmd = new Command("variable");
+                VariableUsageCommandLine.CmdSymbols.ForEach(a => variableUsageCmd.Add(a));
+                variableUsageCmd.Handler = CommandHandler.Create<VariableUsageConfiguration>(c => ExecuteVariableUsage(c));
+                usageCmd.Add(variableUsageCmd);
 
                 // int res = rootCommand.InvokeAsync(args).Result;
                 int res = rootCommand.Invoke(args);
@@ -50,7 +46,7 @@ namespace OctoDump
         {
             try
             {
-                var conn = new OctoConnection();
+                var conn = new OctoConnection(conf.Server, conf.ApiKey);
                 var spaceRepo = conn.GetSpaceRepository();
                 var vsSearch = new VariableSetUsage(spaceRepo);
                 vsSearch.Search(conf.VariableSetName);
@@ -66,7 +62,7 @@ namespace OctoDump
         {
             try
             {
-                var conn = new OctoConnection();
+                var conn = new OctoConnection(conf.Server, conf.ApiKey);
                 var spaceRepo = conn.GetSpaceRepository();
                 var vsSearch = new VariableUsage(spaceRepo);
                 vsSearch.Search(conf.VariableName);
@@ -77,21 +73,5 @@ namespace OctoDump
                                         exception.ToString());
             }
         }
-
-
-        private static void Execute(OctoDumpConfiguration o)
-        {
-            try
-            {
-                var conn = new OctoConnection();
-                var spaceRepo = conn.GetSpaceRepository();
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine("Error: " + Environment.NewLine +
-                                        exception.Message);
-            }
-        }
-
     }
 }
